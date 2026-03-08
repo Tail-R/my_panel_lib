@@ -1,9 +1,6 @@
 # About The Project
 A tiny GTK4 Vala wrapper for my personal use :3
 
-# Example
-![Panel](assets/panel.png)
-
 # Syntax
 ![demo](assets/demo.png)
 
