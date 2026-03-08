@@ -3,7 +3,9 @@ using CustomWidgets;
 
 int main(string[] args) {
     UIBuilder sample_widget = () =>
-        new MyBox(H).pack(new MyLabel("Hello Vala GTK-4 !"));
+        new MyBox(H).pack(
+            new MyLabel("Hello Vala GTK-4 !")
+        );
 
     var config = new WindowConfig() {
         title           = "Demo Window",
