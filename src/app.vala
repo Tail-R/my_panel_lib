@@ -9,10 +9,24 @@ namespace CustomApp {
         public int default_height;
         public bool resizable;
         public UIBuilder ui_builder;
+
+        public WindowConfig (
+            string t,
+            int dw,
+            int dh,
+            bool allow_resize,
+            UIBuilder ub
+        ) {
+            title = t;
+            default_width = dw;
+            default_height = dh;
+            resizable = allow_resize;
+            ui_builder = ub;
+        }
     }
 
     public class MyApp : Gtk.Application {
-        private const string APP_ID = "local.ronove.MyPanel";
+        private const string APP_ID = "local.tailr.MyPanel";
         private const string CSS_PATH = "assets/style.css";
         private WindowConfig config;
 

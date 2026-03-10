@@ -7,13 +7,13 @@ int main(string[] args) {
             new MyLabel("Hello Vala GTK-4 !")
         );
 
-    var config = new WindowConfig() {
-        title           = "Demo Window",
-        default_width   = 200,
-        default_height  = 50,
-        resizable       = true,
-        ui_builder      = sample_widget
-    };
+    var config = new WindowConfig(
+        "Demo Window",
+        200,
+        50,
+        true, // resizable
+        sample_widget
+    );
 
     var app = new MyApp(config);
 
