@@ -8,7 +8,7 @@ namespace CustomApp {
         public int default_width;
         public int default_height;
         public bool resizable;
-        public UIBuilder ui_builder;
+        public owned UIBuilder ui_builder;
 
         public WindowConfig (
             string t,
@@ -26,8 +26,8 @@ namespace CustomApp {
     }
 
     public class MyApp : Gtk.Application {
-        private const string APP_ID = "local.tailr.MyPanel";
-        private const string CSS_PATH = "assets/style.css";
+        private const string APP_ID = "local.Tail-R.MyPanel";
+        private const string CSS_PATH = "/com/tailr/sysmon/assets/style.css";
         private WindowConfig config;
 
         public MyApp(WindowConfig wc) {
@@ -46,7 +46,7 @@ namespace CustomApp {
         // CSS loader
         private void load_css() {
             var provider = new Gtk.CssProvider();
-            provider.load_from_path(CSS_PATH);
+            provider.load_from_resource(CSS_PATH);
 
             Gtk.StyleContext.add_provider_for_display(
                 Gdk.Display.get_default(),

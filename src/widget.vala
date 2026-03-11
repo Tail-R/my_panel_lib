@@ -59,7 +59,7 @@ namespace CustomWidgets {
     }
 
     /*
-        Label widget 
+        Label widget
      */
     public class MyLabel : MyBox {
         private Gtk.Label label;
@@ -109,8 +109,11 @@ namespace CustomWidgets {
             return this;
         }
 
-        // You can use this to periodically update the label text
+        // You can use this to periodically update the label text.
         public MyLabel poll_command_sync(uint interval_ms, string command) {
+            // If you need more polling rate, use the async version instead.
+            var timeout_ms = interval_ms > 100 ? interval_ms : 100;
+
             stop_poll();
 
             cb = () => {
@@ -118,7 +121,7 @@ namespace CustomWidgets {
 
                 if (cmd == null || cmd.strip() == "")
                 {
-                    this.text("EXCEPTION: null command");
+                    this.text("ERROR: null command");
 
                     return false;
                 }
@@ -142,13 +145,12 @@ namespace CustomWidgets {
                 }
 
                 return true; // Continue the timer
-
             };
 
             // Execute once to initialize the label text
             cb();
 
-            timeout_id = GLib.Timeout.add(interval_ms, cb);
+            timeout_id = GLib.Timeout.add(timeout_ms, cb);
 
             return this;
         }
@@ -181,7 +183,7 @@ namespace CustomWidgets {
         public MyButton command_on_clicked(string command) {
             cmd = command;
 
-            button.clicked.connect(() => {
+            ;button.clicked.connect(() => {
                 on_clicked();
             });
 
@@ -201,6 +203,106 @@ namespace CustomWidgets {
             } catch (Error e) {
                 /* Do something */
             };
+        }
+    }
+
+    /*
+        Scale widget
+     */
+    public class MyScale : MyBox {
+        private Gtk.Scale scale;
+        private GLib.SourceFunc cb;
+        private uint timeout_id = 0;
+
+        public MyScale(
+            Gtk.Orientation orientation = H,
+            float val = 50,
+            float min_val = 0,
+            float max_val = 100,
+            string? css_class = null,
+            bool inverted = false
+        ) {
+            base(orientation, css_class);
+
+            var adj = new Gtk.Adjustment(
+                val,
+                min_val,
+                max_val,
+                0, 0, 0
+            );
+
+            scale = new Gtk.Scale(orientation, adj);
+            scale.inverted = inverted;
+            scale.sensitive = false;
+
+            append(scale);
+        }
+
+        ~MyScale() {
+            stop_poll();
+        }
+
+        public MyScale poll_value_sync(uint interval_ms, string command) {
+            var timeout_ms = interval_ms > 100 ? interval_ms : 100;
+
+            stop_poll();
+
+            cb = () => {
+                string cmd = command;
+
+                if (cmd == null || cmd.strip() == "")
+                {
+                    stderr.printf("ERROR: null command\n");
+
+                    return false;
+                }
+
+                try {
+                    string out_str;
+                    string err_str;
+                    int status;
+
+                    Process.spawn_command_line_sync(
+                        cmd,
+                        out out_str,
+                        out err_str,
+                        out status
+                    );
+
+                    float val;
+
+                    if (float.try_parse(out_str.strip(), out val))
+                    {
+                        scale.set_value(val);
+                    }
+                    else
+                    {
+                        scale.set_value(-1);
+                        stderr.printf("ERROR: Failed to parse '%s' into a float\n", out_str);
+                    }
+
+                } catch (Error e) {
+                    scale.set_value(-1);
+                    stderr.printf("EXCEPTION: %s\n", e.message);
+                }
+
+                return true; // Continue the timer
+            };
+
+            // Execute once to initialize the label text
+            cb();
+
+            timeout_id = GLib.Timeout.add(timeout_ms, cb);
+
+            return this;
+        }
+
+        public void stop_poll() {
+            if (timeout_id != 0)
+            {
+                GLib.Source.remove(timeout_id);
+                timeout_id = 0;
+            }
         }
     }
 
